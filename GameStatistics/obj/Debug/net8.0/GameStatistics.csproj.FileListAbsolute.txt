@@ -166,3 +166,4 @@ D:\projekts\2025\GameStatisticsScania\GameStatistics\GameStatistics\obj\Debug\ne
 D:\projekts\2025\GameStatisticsScania\GameStatistics\GameStatistics\obj\Debug\net8.0\GameStatistics.pdb
 D:\projekts\2025\GameStatisticsScania\GameStatistics\GameStatistics\obj\Debug\net8.0\GameStatistics.genruntimeconfig.cache
 D:\projekts\2025\GameStatisticsScania\GameStatistics\GameStatistics\obj\Debug\net8.0\ref\GameStatistics.dll
+D:\projekts\2025\GameStatisticsScania\GameStatistics\GameStatistics\obj\Debug\net8.0\GameStatistics.sourcelink.json
