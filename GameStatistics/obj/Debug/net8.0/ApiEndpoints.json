@@ -1,0 +1,65 @@
+[
+  {
+    "ContainingType": "GameStatistics.Controllers.GameStatisticsController",
+    "Method": "SaveGameStatistics",
+    "RelativePath": "api/GameStatistics",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "workshopStats",
+        "Type": "GameStatistics.DTO.WorkshopDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GameStatistics.Controllers.GameStatisticsController",
+    "Method": "GetAverageStatistics",
+    "RelativePath": "api/GameStatistics",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GameStatistics.Controllers.GameStatisticsController",
+    "Method": "UpdateStatistics",
+    "RelativePath": "api/GameStatistics",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "GameStatistics.DTO.WorkshopDTO",
+        "IsRequired": true
+      },
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GameStatistics.Controllers.GameStatisticsController",
+    "Method": "DeleteStatistics",
+    "RelativePath": "api/GameStatistics",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  }
+]
