@@ -22,34 +22,42 @@ namespace GameStatistics.Controllers
 		{
 			if (workshopStats == null)
 				return BadRequest();
+			if(workshopStats.WorkShopVisits == 0 || workshopStats.TotalWorkshopTimeInSeconds == 0)
+				return BadRequest("All values in the workshop statistics are 0. Cannot save to the database.");
 			else
 			{
-				await _service.AddGameStatistics(workshopStats);
-				return Ok();
+				var savedStats = await _service.AddGameStatistics(workshopStats);
+				return Ok(savedStats);
 			}
 		}
 
 		[HttpGet]
-		public async Task<IActionResult> GetAverageStatistics()
+		public async Task<IActionResult> GetStatistics()
 		{
 			var averageVisits = await _service.GetAverageVisits();
 			var averageTime = await _service.GetAverageTime();
 
+			var medianVisits = await _service.GetMedianVisits();
+
 			if (averageVisits == 0 || averageTime == 0)
 				return BadRequest("No data available to calculate statistics.");
+			if (medianVisits == 0)
+				return BadRequest("No data available to calculate statistics.");
 
-			return Ok($"Average workshop visits: {averageVisits}\nAverage time spent in workshop: {averageTime}");
+			return Ok($"Average workshop visits: {averageVisits}" +
+				$"\nMedian of workshop visits: {medianVisits}" +
+				$"\nAverage time spent in workshop: {averageTime}");
 		}
 
 		[HttpPut]
-		public async Task<IActionResult> UpdateStatistics([FromBody] WorkshopDTO dto, int id)
+		public async Task<IActionResult> UpdateStatistics([FromBody] UpdateWorkshopDTO dto)
 		{
-			if (dto == null)
-				return BadRequest();
+			if (dto == null || dto.Id <= 0)
+				return BadRequest("Invalid workshop data.");
 
-			var updatedStats = await _service.UpdateWorkshop(dto, id);
+			var updatedStats = await _service.UpdateWorkshop(dto);
 			if (updatedStats == null)
-				return BadRequest($"Workshop with ID {id} was not found");
+				return NotFound($"Workshop with ID {dto.Id} was not found");
 
 			return Ok(updatedStats);
 		}
@@ -57,12 +65,12 @@ namespace GameStatistics.Controllers
 		[HttpDelete]
 		public async Task<IActionResult> DeleteStatistics(int id)
 		{
-			string stats = await _service.DeleteStatistics(id);
+			var stats = await _service.DeleteStatistics(id);
 
-			if (stats == "Deleted")
-				return Ok(stats);
+			if (stats != null)
+				return Ok($"Statistics with ID {id} successfully got deleted.");
 			else
-				return BadRequest(stats);
+				return NotFound($"Statistics with ID {id} does not exist.");
 		}
 	}
 }

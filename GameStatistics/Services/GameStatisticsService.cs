@@ -15,7 +15,7 @@ namespace GameStatistics.Services
 			_context = context;
 		}
 
-		public async Task AddGameStatistics(WorkshopDTO dto)
+		public async Task <Workshop> AddGameStatistics(WorkshopDTO dto)
 		{
 			Workshop workshop = new()
 			{
@@ -24,6 +24,8 @@ namespace GameStatistics.Services
 			};
 			_context.Workshops.Add(workshop);
 			await _context.SaveChangesAsync();
+
+			return workshop;
 		}
 
 		public async Task<double> GetAverageVisits()
@@ -44,7 +46,42 @@ namespace GameStatistics.Services
 			   .AverageAsync(w => w.TotalWorkshopTimeInSeconds);
 		}
 
-		public async Task<string> DeleteStatistics(int id)
+		public async Task<double> GetMedianVisits()
+		{
+			var stats = await _context.Workshops.Select(w => w.WorkShopVisits).ToListAsync();
+
+			if(stats == null)
+				return 0;
+
+			stats.Sort();
+			int count = stats.Count();
+
+			//if count is odd, return the middle value
+			if (count % 2 == 1)
+				return stats[count / 2];
+			else
+			{
+				//If count is even, calculate the average of the two middle numbers
+				double middle1 = stats[(count / 2) - 1];
+				double middle2 = stats[(count / 2)];
+				return (middle1 + middle2) / 2;
+			}
+		}
+
+		public async Task<Workshop?> UpdateWorkshop(UpdateWorkshopDTO dto)
+		{
+			var workshopStats = await _context.Workshops.FirstOrDefaultAsync(w => w.Id == dto.Id);
+			if (workshopStats == null)
+				return null;
+
+			workshopStats.WorkShopVisits = dto.WorkShopVisits;
+			workshopStats.TotalWorkshopTimeInSeconds = dto.TotalWorkshopTimeInSeconds;
+			//_context.Update(workshopStats);
+			await _context.SaveChangesAsync();
+			return workshopStats;
+		}
+
+		public async Task<Workshop?> DeleteStatistics(int id)
 		{
 			var stats = await _context.Workshops.FirstOrDefaultAsync(w => w.Id == id);
 
@@ -52,23 +89,10 @@ namespace GameStatistics.Services
 			{
 				_context.Workshops.Remove(stats);
 				await _context.SaveChangesAsync();
-				return "Deleted";
+				return stats;
 			}
 			else
-				return $"Statistics with ID {id} does not exist.";
-		}
-
-		public async Task<Workshop?> UpdateWorkshop(WorkshopDTO dto, int id)
-		{
-			var workshopStats = await _context.Workshops.FirstOrDefaultAsync(w => w.Id == id);
-			if (workshopStats == null)
 				return null;
-
-			workshopStats.WorkShopVisits = dto.WorkShopVisits;
-			workshopStats.TotalWorkshopTimeInSeconds = dto.TotalWorkshopTimeInSeconds;
-			_context.Update(workshopStats);
-			await _context.SaveChangesAsync();
-			return workshopStats;
 		}
 	}
 }

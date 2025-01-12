@@ -3,10 +3,6 @@
   "WorkspaceRootPath": "C:\\repos\\Game-Statistics\\GameStatistics\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|c:\\repos\\game-statistics\\gamestatistics\\gamestatistics\\interfaces\\igamestatisticsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|solutionrelative:gamestatistics\\interfaces\\igamestatisticsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|c:\\repos\\game-statistics\\gamestatistics\\gamestatistics\\services\\gamestatisticsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|solutionrelative:gamestatistics\\services\\gamestatisticsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -15,16 +11,12 @@
       "RelativeMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|solutionrelative:gamestatistics\\controllers\\gamestatisticscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|c:\\repos\\game-statistics\\gamestatistics\\gamestatistics\\context\\gamestatisticscontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|solutionrelative:gamestatistics\\context\\gamestatisticscontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|c:\\repos\\game-statistics\\gamestatistics\\gamestatistics\\interfaces\\igamestatisticsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|solutionrelative:gamestatistics\\interfaces\\igamestatisticsservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|c:\\repos\\game-statistics\\gamestatistics\\gamestatistics\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|solutionrelative:gamestatistics\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|c:\\repos\\game-statistics\\gamestatistics\\gamestatistics\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|solutionrelative:gamestatistics\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|c:\\repos\\game-statistics\\gamestatistics\\gamestatistics\\dto\\updateworkshopdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|solutionrelative:gamestatistics\\dto\\updateworkshopdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|c:\\repos\\game-statistics\\gamestatistics\\gamestatistics\\dto\\workshopdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -33,6 +25,14 @@
     {
       "AbsoluteMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|c:\\repos\\game-statistics\\gamestatistics\\gamestatistics\\models\\workshop.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|solutionrelative:gamestatistics\\models\\workshop.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|c:\\repos\\game-statistics\\gamestatistics\\gamestatistics\\context\\gamestatisticscontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|solutionrelative:gamestatistics\\context\\gamestatisticscontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|c:\\repos\\game-statistics\\gamestatistics\\gamestatistics\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6BEDA8A5-9CEB-4E7E-985A-A39DC962EF60}|GameStatistics\\GameStatistics.csproj|solutionrelative:gamestatistics\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -70,73 +70,78 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 3,
+              "Title": "UpdateWorkshopDTO.cs",
+              "DocumentMoniker": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\DTO\\UpdateWorkshopDTO.cs",
+              "RelativeDocumentMoniker": "GameStatistics\\DTO\\UpdateWorkshopDTO.cs",
+              "ToolTip": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\DTO\\UpdateWorkshopDTO.cs",
+              "RelativeToolTip": "GameStatistics\\DTO\\UpdateWorkshopDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-12T18:29:48.402Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "WorkshopDTO.cs",
               "DocumentMoniker": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\DTO\\WorkshopDTO.cs",
               "RelativeDocumentMoniker": "GameStatistics\\DTO\\WorkshopDTO.cs",
               "ToolTip": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\DTO\\WorkshopDTO.cs",
               "RelativeToolTip": "GameStatistics\\DTO\\WorkshopDTO.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAMAAAAFAAAA",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-10T12:20:46.768Z"
+              "WhenOpened": "2025-01-10T12:20:46.768Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 5,
               "Title": "Workshop.cs",
               "DocumentMoniker": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\Models\\Workshop.cs",
               "RelativeDocumentMoniker": "GameStatistics\\Models\\Workshop.cs",
               "ToolTip": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\Models\\Workshop.cs",
               "RelativeToolTip": "GameStatistics\\Models\\Workshop.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAQAAAAMAAAA",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-10T12:20:46.799Z"
+              "WhenOpened": "2025-01-10T12:20:46.799Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 6,
               "Title": "GameStatisticsContext.cs",
               "DocumentMoniker": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\Context\\GameStatisticsContext.cs",
               "RelativeDocumentMoniker": "GameStatistics\\Context\\GameStatisticsContext.cs",
               "ToolTip": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\Context\\GameStatisticsContext.cs",
               "RelativeToolTip": "GameStatistics\\Context\\GameStatisticsContext.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAoAAAAFAAAA",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-10T12:20:46.799Z"
+              "WhenOpened": "2025-01-10T12:20:46.799Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 7,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\Program.cs",
               "RelativeDocumentMoniker": "GameStatistics\\Program.cs",
               "ToolTip": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\Program.cs",
               "RelativeToolTip": "GameStatistics\\Program.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABMAAABMAAAA",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAABkAAAAXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-10T12:20:46.816Z"
+              "WhenOpened": "2025-01-10T12:20:46.816Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\appsettings.json",
-              "RelativeDocumentMoniker": "GameStatistics\\appsettings.json",
-              "ToolTip": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\appsettings.json",
-              "RelativeToolTip": "GameStatistics\\appsettings.json",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAwAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-01-10T12:20:46.817Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "GameStatisticsService.cs",
-              "DocumentMoniker": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\Services\\GameStatisticsService.cs",
-              "RelativeDocumentMoniker": "GameStatistics\\Services\\GameStatisticsService.cs",
-              "ToolTip": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\Services\\GameStatisticsService.cs",
-              "RelativeToolTip": "GameStatistics\\Services\\GameStatisticsService.cs",
-              "ViewState": "AgIAACUAAAAAAAAAAAA1wEgAAAACAAAAAAAAAA==",
+              "DocumentIndex": 2,
+              "Title": "IGameStatisticsService.cs",
+              "DocumentMoniker": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\Interfaces\\IGameStatisticsService.cs",
+              "RelativeDocumentMoniker": "GameStatistics\\Interfaces\\IGameStatisticsService.cs",
+              "ToolTip": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\Interfaces\\IGameStatisticsService.cs",
+              "RelativeToolTip": "GameStatistics\\Interfaces\\IGameStatisticsService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAA2AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-01-10T12:20:46.817Z",
               "EditorCaption": ""
@@ -144,25 +149,25 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "IGameStatisticsService.cs",
-              "DocumentMoniker": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\Interfaces\\IGameStatisticsService.cs",
-              "RelativeDocumentMoniker": "GameStatistics\\Interfaces\\IGameStatisticsService.cs",
-              "ToolTip": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\Interfaces\\IGameStatisticsService.cs",
-              "RelativeToolTip": "GameStatistics\\Interfaces\\IGameStatisticsService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAA6AAAAAAAAAA==",
+              "Title": "GameStatisticsService.cs",
+              "DocumentMoniker": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\Services\\GameStatisticsService.cs",
+              "RelativeDocumentMoniker": "GameStatistics\\Services\\GameStatisticsService.cs",
+              "ToolTip": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\Services\\GameStatisticsService.cs",
+              "RelativeToolTip": "GameStatistics\\Services\\GameStatisticsService.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAQwDgAAAAdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-01-10T12:20:46.817Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "GameStatisticsController.cs",
               "DocumentMoniker": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\Controllers\\GameStatisticsController.cs",
               "RelativeDocumentMoniker": "GameStatistics\\Controllers\\GameStatisticsController.cs",
               "ToolTip": "C:\\repos\\Game-Statistics\\GameStatistics\\GameStatistics\\Controllers\\GameStatisticsController.cs",
               "RelativeToolTip": "GameStatistics\\Controllers\\GameStatisticsController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEIAAAACAAAAAAAAAA==",
+              "ViewState": "AgIAABsAAAAAAAAAAAAYwDcAAAAtAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-01-10T12:20:46.817Z",
               "EditorCaption": ""

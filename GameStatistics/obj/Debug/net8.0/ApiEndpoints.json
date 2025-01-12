@@ -17,7 +17,7 @@
   },
   {
     "ContainingType": "GameStatistics.Controllers.GameStatisticsController",
-    "Method": "GetAverageStatistics",
+    "Method": "GetStatistics",
     "RelativePath": "api/GameStatistics",
     "HttpMethod": "GET",
     "IsController": true,
