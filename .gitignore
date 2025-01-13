@@ -1,0 +1,13 @@
+# Build files
+bin/
+obj/
+out/
+Debug/
+Release/
+
+# User specific files
+*.user
+*.swp
+*.suo
+*.userosscache
+*.userprefs
