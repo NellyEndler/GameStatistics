@@ -29,7 +29,15 @@ namespace GameStatistics.Controllers
         {
             var avarageVisits = await _service.GetAvarageVisits();
             var avarageTime = await _service.GetAverageTime();
-            return Ok($"Avarage workshop visits: {avarageVisits}\nAvarage time spent in workshop: {avarageTime}");
+            return Ok($"Average workshop visits: {avarageVisits}\nAverage time spent in workshop: {avarageTime}");
+        }
+
+        [HttpGet]
+        [Route("allstats")]
+        public async Task <IActionResult> GetAllStatistics()
+        {
+            var allStats = await _service.GetAllStats();
+            return Ok(allStats);
         }
     }
 }

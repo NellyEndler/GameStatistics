@@ -41,5 +41,11 @@ namespace GameStatistics.Services
 
             return avarageTime;
         }
+
+        public async Task<List<Workshop>> GetAllStats()
+        {
+            var allStats = await _context.Workshops.ToListAsync();
+            return allStats;
+        }
     }
 }

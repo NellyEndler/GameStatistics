@@ -8,5 +8,6 @@ namespace GameStatistics.Interfaces
         Task AddGameStatistics(WorkshopDTO workshopStats);
         Task<double> GetAvarageVisits();
         Task<double> GetAverageTime();
+        Task <List<Workshop>> GetAllStats();
     }
 }
