@@ -6,46 +6,102 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GameStatistics.Services
 {
-    public class GameStatisticsService : IGameStatisticsService
-    {
-        private readonly GameStatisticsContext _context;
+	public class GameStatisticsService : IGameStatisticsService
+	{
+		private readonly GameStatisticsContext _context;
 
-        public GameStatisticsService(GameStatisticsContext context)
-        {
-            _context = context;
-        }
+		public GameStatisticsService(GameStatisticsContext context)
+		{
+			_context = context;
+		}
 
-        public async Task AddGameStatistics(WorkshopDTO dto)
-        {
-            Workshop workshop = new()
-            {
-                WorkShopVisits = dto.WorkShopVisits,
-                TotalWorkshopTimeInSeconds = dto.TotalWorkshopTimeInSeconds
-            };
-            _context.Workshops.Add(workshop);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<double> GetAvarageVisits()
-        {
-            var avarageVisits = await _context.Workshops
-                .AverageAsync(w => w.WorkShopVisits);
-
-            return avarageVisits;
-        }
-
-        public async Task<double> GetAverageTime()
-        {
-            var avarageTime = await _context.Workshops
-               .AverageAsync(w => w.TotalWorkshopTimeInSeconds);
-
-            return avarageTime;
-        }
-
-        public async Task<List<Workshop>> GetAllStats()
+        public async Task<List<Workshop>?> GetAll()
         {
             var allStats = await _context.Workshops.ToListAsync();
-            return allStats;
+			if (allStats == null)
+				return null;
+			else
+				return allStats;
         }
+
+        public async Task <Workshop> AddGameStatistics(WorkshopDTO dto)
+		{
+			Workshop workshop = new()
+			{
+				WorkShopVisits = dto.WorkShopVisits,
+				TotalWorkshopTimeInSeconds = dto.TotalWorkshopTimeInSeconds
+			};
+			_context.Workshops.Add(workshop);
+			await _context.SaveChangesAsync();
+
+			return workshop;
+		}
+
+		public async Task<double> GetAverageVisits()
+		{
+			if (!await _context.Workshops.AnyAsync())
+				return 0;
+
+			return await _context.Workshops
+				.AverageAsync(w => w.WorkShopVisits);
+		}
+
+		public async Task<double> GetAverageTime()
+		{
+			if (!await _context.Workshops.AnyAsync())
+				return 0;
+
+			return await _context.Workshops
+			   .AverageAsync(w => w.TotalWorkshopTimeInSeconds);
+		}
+
+		public async Task<double> GetMedianVisits()
+		{
+			var stats = await _context.Workshops.Select(w => w.WorkShopVisits).ToListAsync();
+
+			if(stats == null)
+				return 0;
+
+			stats.Sort();
+			int count = stats.Count();
+
+			//if count is odd, return the middle value
+			if (count % 2 == 1)
+				return stats[count / 2];
+			else
+			{
+				//If count is even, calculate the average of the two middle numbers
+				double middle1 = stats[(count / 2) - 1];
+				double middle2 = stats[(count / 2)];
+				return (middle1 + middle2) / 2;
+			}
+		}
+
+		public async Task<Workshop?> UpdateWorkshop(UpdateWorkshopDTO dto)
+		{
+			var workshopStats = await _context.Workshops.FirstOrDefaultAsync(w => w.Id == dto.Id);
+			if (workshopStats == null)
+				return null;
+
+			workshopStats.WorkShopVisits = dto.WorkShopVisits;
+			workshopStats.TotalWorkshopTimeInSeconds = dto.TotalWorkshopTimeInSeconds;
+			//_context.Update(workshopStats);
+			await _context.SaveChangesAsync();
+			return workshopStats;
+		}
+
+		public async Task<Workshop?> DeleteStatistics(int id)
+		{
+			var stats = await _context.Workshops.FirstOrDefaultAsync(w => w.Id == id);
+
+			if (stats != null)
+			{
+				_context.Workshops.Remove(stats);
+				await _context.SaveChangesAsync();
+				return stats;
+			}
+			else
+				return null;
+		}
     }
 }

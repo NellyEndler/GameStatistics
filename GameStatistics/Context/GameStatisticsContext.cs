@@ -1,9 +1,11 @@
 ﻿using GameStatistics.Models;
+using GameStatistics.Models.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameStatistics.Context
 {
-    public class GameStatisticsContext:DbContext
+    public class GameStatisticsContext:IdentityDbContext<ApplicationUser>
     {
         public GameStatisticsContext(DbContextOptions<GameStatisticsContext> options) : base(options) { }
 
