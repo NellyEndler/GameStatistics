@@ -6,16 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GameStatistics.Services
 {
-	public class GameStatisticsService : IGameStatisticsService
+	public class GameStatisticsService(GameStatisticsContext context) : IGameStatisticsService
 	{
-		private readonly GameStatisticsContext _context;
+		private readonly GameStatisticsContext _context = context;
 
-		public GameStatisticsService(GameStatisticsContext context)
-		{
-			_context = context;
-		}
-
-        public async Task<List<Workshop>?> GetAll()
+		public async Task<List<Workshop>?> GetAll()
         {
             var allStats = await _context.Workshops.ToListAsync();
 			if (allStats == null)
@@ -63,7 +58,7 @@ namespace GameStatistics.Services
 				return 0;
 
 			stats.Sort();
-			int count = stats.Count();
+			int count = stats.Count;
 
 			//if count is odd, return the middle value
 			if (count % 2 == 1)

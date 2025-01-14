@@ -10,20 +10,13 @@ using System.Text;
 
 namespace GameStatistics.Services
 {
-    public class UserService : IUserService
+    public class UserService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration) : IUserService
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly IConfiguration _configuration;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
+        private readonly IConfiguration _configuration = configuration;
 
-        public UserService(GameStatisticsContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _configuration = configuration;
-        }
-
-        public async Task<SignInResult?> Login(LoginDTO dto)
+		public async Task<SignInResult?> Login(LoginDTO dto)
         {
             var loginUser = await _signInManager.PasswordSignInAsync(dto.UserName, dto.Password, false, false);
             if (!loginUser.Succeeded)
@@ -96,6 +89,9 @@ namespace GameStatistics.Services
             // Hämtar roller kopplade till användaren.
             var roles = await _userManager.GetRolesAsync(user);
 
+/*            if (string.IsNullOrEmpty(user.UserName) || (string.IsNullOrEmpty(user.Email)))
+                return null;
+*/
             // Skapar en lista av claims som ska inkluderas i JWT-token.
             var claims = new List<Claim>
             {
@@ -122,7 +118,7 @@ namespace GameStatistics.Services
                 issuer: _configuration["Jwt:Issuer"], // Issuer (vem som skapade och signerade token).
                 audience: _configuration["Jwt:Audience"], // Audience (vilka som får använda token).
                 claims: claims, // De claims som token innehåller.
-                expires: DateTime.UtcNow.AddHours(1), // Tokenens giltighetstid (1 timme).
+                expires: DateTime.Now.AddHours(1), // Tokenens giltighetstid (1 timme).
                 signingCredentials: creds // Signeringsuppgifterna för att verifiera tokenens äkthet.
             );
 

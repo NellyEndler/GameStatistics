@@ -58,7 +58,7 @@ namespace GameStatistics.Controllers
             {
                 var user = await _service.GetUserByUsername(loginDTO.UserName);
                 if (user == null)
-                    return Unauthorized("User not found");
+                    return NotFound("User not found");
 
                 var token = await _service.GenerateJwtToken(user);
                 return Ok(new
