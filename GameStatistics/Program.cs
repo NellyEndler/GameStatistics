@@ -34,6 +34,10 @@ builder.Services.AddCors(options =>
 });
 
 var key = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrEmpty(key))
+{
+    throw new InvalidOperationException("JWT Key is not configured. Please check the configuration settings.");
+}
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -75,11 +79,11 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Seed roles & users on application start
-using (var scope = app.Services.CreateScope())
+/*using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var dataSeeder = services.GetRequiredService<DataSeeder>();
     await dataSeeder.SeedRolesAndUsers();
-}
+}*/
 
 app.Run();

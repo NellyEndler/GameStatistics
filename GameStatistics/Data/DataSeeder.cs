@@ -3,16 +3,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace GameStatistics.Data
 {
-    public class DataSeeder
+    public class DataSeeder(RoleManager<IdentityRole> roleManager)
     {
-        private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly UserManager<ApplicationUser> _userManager;
-
-        public DataSeeder(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
-        {
-            _roleManager = roleManager;
-            _userManager = userManager;
-        }
+        private readonly RoleManager<IdentityRole> _roleManager = roleManager;
 
         public async Task SeedRolesAndUsers()
         {
@@ -24,25 +17,6 @@ namespace GameStatistics.Data
             if (!await _roleManager.RoleExistsAsync("User"))
             {
                 await _roleManager.CreateAsync(new IdentityRole("User"));
-            }
-
-            var adminEmail = "admin@example.com";
-            var adminUser = await _userManager.FindByEmailAsync(adminEmail);
-            if (adminUser == null)
-            {
-                var user = new ApplicationUser
-                {
-                    UserName = "admin",
-                    Email = adminEmail,
-                    FirstName = "Admin",
-                    LastName = "User"
-                };
-
-                var result = await _userManager.CreateAsync(user, "AdminPassword123!");
-                if (result.Succeeded)
-                {
-                    await _userManager.AddToRoleAsync(user, "Admin");
-                }
             }
         }
     }

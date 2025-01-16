@@ -336,3 +336,5 @@ C:\repos\Game-Statistics\GameStatistics\GameStatistics\obj\Debug\net8.0\refint\G
 C:\repos\Game-Statistics\GameStatistics\GameStatistics\obj\Debug\net8.0\GameStatistics.pdb
 C:\repos\Game-Statistics\GameStatistics\GameStatistics\obj\Debug\net8.0\GameStatistics.genruntimeconfig.cache
 C:\repos\Game-Statistics\GameStatistics\GameStatistics\obj\Debug\net8.0\ref\GameStatistics.dll
+D:\projekts\2025\GameStatisticsScania\GameStatistics\GameStatistics\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\projekts\2025\GameStatisticsScania\GameStatistics\GameStatistics\bin\Debug\net8.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll

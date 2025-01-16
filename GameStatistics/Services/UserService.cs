@@ -1,8 +1,9 @@
-﻿using GameStatistics.Context;
-using GameStatistics.DTO;
+﻿using GameStatistics.DTO;
 using GameStatistics.Interfaces;
 using GameStatistics.Models.Identity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -10,13 +11,53 @@ using System.Text;
 
 namespace GameStatistics.Services
 {
-    public class UserService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration) : IUserService
+    public class UserService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, IHttpContextAccessor contextAccessor) : IUserService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
+        private readonly IHttpContextAccessor _contextAccessor = contextAccessor;
         private readonly IConfiguration _configuration = configuration;
 
-		public async Task<SignInResult?> Login(LoginDTO dto)
+        public async Task<List<ShowUserDTO>?> GetAllUsers(string? role)
+        {
+            var users = await _userManager.Users.ToListAsync();
+
+            if (users == null || users.Count == 0)
+                return new List<ShowUserDTO>();
+
+            List<ApplicationUser> filteredUsers;
+
+            if (string.IsNullOrEmpty(role))
+                filteredUsers = users;
+            else
+                filteredUsers = users.Where(user => _userManager.IsInRoleAsync(user, role).Result).ToList();
+
+            var userDtos = filteredUsers.Select(user => new ShowUserDTO
+            {
+                Username = user.UserName,
+                Email = user.Email
+            }).ToList();
+
+            return userDtos;
+        }
+
+/*        public async Task<List<ApplicationUser>?> GetAllAdmins()
+        {
+            var adminUsers = new List<ApplicationUser>();
+            var users = await _userManager.Users.ToListAsync();
+            if (users == null)
+                return null;
+
+            foreach (var user in users)
+            {
+                if (await _userManager.IsInRoleAsync(user, "Admin"))
+                    adminUsers.Add(user);
+            }
+            return adminUsers;
+        }*/
+
+
+        public async Task<Microsoft.AspNetCore.Identity.SignInResult?> Login(LoginDTO dto)
         {
             var loginUser = await _signInManager.PasswordSignInAsync(dto.UserName, dto.Password, false, false);
             if (!loginUser.Succeeded)
@@ -48,7 +89,7 @@ namespace GameStatistics.Services
             return result;
         }
 
-        public async Task<IdentityResult> RegisterUser(UserDTO dto)
+        public async Task<IdentityResult?> RegisterUser(UserDTO dto)
         {
             var userModel = new ApplicationUser
             {
@@ -72,6 +113,62 @@ namespace GameStatistics.Services
             return result;
         }
 
+        public async Task<UpdateUserDTO?> UpdateUser(UpdateUserDTO dto, int id)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
+                return null;
+
+            user.FirstName = dto.FirstName;
+            user.LastName = dto.LastName;
+            user.UserName = dto.Username;
+            user.PasswordHash = dto.Username;
+            user.Email = dto.Email;
+
+            var roles = await _userManager.GetRolesAsync(user);
+            await _userManager.RemoveFromRolesAsync(user, roles);
+            await _userManager.AddToRoleAsync(user, dto.Role);
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+                return null;
+
+            var updatedUserDto = new UpdateUserDTO
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Username = user.UserName,
+                Password = user.PasswordHash,
+                Email = user.Email,
+                Role = dto.Role
+            };
+
+            return updatedUserDto;
+        }
+
+        public async Task<IdentityResult?> DeleteUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
+                return null;
+            var result = await _userManager.DeleteAsync(user);
+            if (!result.Succeeded)
+                return null;
+            return result;
+        }
+
+        public async Task<IdentityResult?> DeleteUserAdmin(int id)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
+                return null;
+            var result = await _userManager.DeleteAsync(user);
+            if (!result.Succeeded)
+                return null;
+            return result;
+        }
+
+
         public async Task<ApplicationUser?> GetUserByUsername(string username)
         {
             var user = await _userManager.FindByNameAsync(username);
@@ -89,9 +186,9 @@ namespace GameStatistics.Services
             // Hämtar roller kopplade till användaren.
             var roles = await _userManager.GetRolesAsync(user);
 
-/*            if (string.IsNullOrEmpty(user.UserName) || (string.IsNullOrEmpty(user.Email)))
-                return null;
-*/
+            /*            if (string.IsNullOrEmpty(user.UserName) || (string.IsNullOrEmpty(user.Email)))
+                            return null;
+            */
             // Skapar en lista av claims som ska inkluderas i JWT-token.
             var claims = new List<Claim>
             {
@@ -125,7 +222,5 @@ namespace GameStatistics.Services
             // Returnerar den genererade JWT-token som en sträng.
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
-
     }
 }
