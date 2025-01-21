@@ -1,5 +1,6 @@
 ﻿using GameStatistics.DTO;
 using GameStatistics.Interfaces;
+using GameStatistics.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,7 @@ namespace GameStatistics.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> RegisterAdmin([FromBody] UserDTO dto)
         {
             if (!ModelState.IsValid)
@@ -42,24 +43,35 @@ namespace GameStatistics.Controllers
                 return BadRequest($"Failed to create user {result}");
         }
 
+        [HttpGet]
+        [Authorize]
+        public IActionResult Protected()
+        {
+            return Ok("Välkommen");
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
+        public async Task<IActionResult> LoginUser([FromBody] LoginDTO loginDTO)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _service.Login(loginDTO);
+            var result = await _service.LoginUser(loginDTO);
 
-            if (result != null)
+            if (result.Succeeded)
             {
                 var user = await _service.GetUserByUsername(loginDTO.UserName);
                 if (user == null)
                     return NotFound("User not found");
 
-                var token = await _service.GenerateJwtToken(user);
+                var (token, refreshToken) = await _service.GenerateJwtToken(user);
+                await _service.StoreRefreshToken(user, refreshToken);
+                //var token = _service.CreateToken(user);
+
                 return Ok(new
                 {
-                    Token = token,
+                    AccessToken = token,
+                    RefreshToken = refreshToken,
                     Message = "Login successfull"
                 });
             }
@@ -67,6 +79,33 @@ namespace GameStatistics.Controllers
                 return Unauthorized("Invalid login attempt");
         }
 
+        [HttpPost]
+        public async Task <IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+        {
+            if (string.IsNullOrEmpty(request.UserId) || string.IsNullOrEmpty(request.RefreshToken))
+                return BadRequest("Invalid data");
+
+            var user = await _service.GetUserById(request.UserId);
+
+            if (user == null)
+                return Unauthorized("Invalid user.");
+
+            var isValid = await _service.ValidateRefreshToken(user, request.RefreshToken);
+            if(!isValid)
+                return Unauthorized();
+
+            var newJwtToken = await _service.GenerateJwtToken(user);
+            var newRefreshToken =  _service.GenerateRefreshToken();
+
+            await _service.StoreRefreshToken(user, newRefreshToken);
+            return Ok(new
+            {
+                AccessToken = newJwtToken.jwtToken,
+                RefreshToken = newRefreshToken
+            });
+        }
+
+        [Authorize(Roles = "User")]
         [HttpGet]
         public async Task<IActionResult> GetAllUsers([FromQuery] string? role)
         {

@@ -1,4 +1,5 @@
-﻿using GameStatistics.DTO;
+﻿using GameStatistics.Context;
+using GameStatistics.DTO;
 using GameStatistics.Interfaces;
 using GameStatistics.Models.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -7,14 +8,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace GameStatistics.Services
 {
-    public class UserService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, IHttpContextAccessor contextAccessor) : IUserService
+    public class UserService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager,
+         GameStatisticsContext contex, IConfiguration configuration, IHttpContextAccessor contextAccessor) : IUserService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
+        private readonly GameStatisticsContext _context = contex;
         private readonly IHttpContextAccessor _contextAccessor = contextAccessor;
         private readonly IConfiguration _configuration = configuration;
 
@@ -57,12 +61,22 @@ namespace GameStatistics.Services
         }*/
 
 
-        public async Task<Microsoft.AspNetCore.Identity.SignInResult?> Login(LoginDTO dto)
+        public async Task<Microsoft.AspNetCore.Identity.SignInResult> LoginUser(LoginDTO dto)
         {
-            var loginUser = await _signInManager.PasswordSignInAsync(dto.UserName, dto.Password, false, false);
-            if (!loginUser.Succeeded)
-                return null;
-            return loginUser;
+           // var loginUser1 = await _signInManager.PasswordSignInAsync(dto.UserName, dto.Password, false, false);
+
+            var loginUser = await _userManager.FindByNameAsync(dto.UserName);
+
+            if (loginUser == null)
+                return Microsoft.AspNetCore.Identity.SignInResult.Failed;
+
+            var loginResult = await _signInManager.CheckPasswordSignInAsync(loginUser, dto.Password, false);
+            //var validPassword = await _userManager.CheckPasswordAsync(loginUser, dto.Password);
+
+            if(loginResult != null)
+                return Microsoft.AspNetCore.Identity.SignInResult.Success;
+
+            return Microsoft.AspNetCore.Identity.SignInResult.Failed;
         }
 
         public async Task<IdentityResult?> RegisterAdmin(UserDTO dto)
@@ -178,7 +192,15 @@ namespace GameStatistics.Services
             return user;
         }
 
-        public async Task<string> GenerateJwtToken(ApplicationUser user)
+        public async Task<ApplicationUser?> GetUserById(string id)
+        {
+            var user = await _userManager.FindByIdAsync($"{id}");
+            if (user == null)
+                return null;
+            return user;
+        }
+
+        public async Task<(string jwtToken, string refreshToken)> GenerateJwtToken(ApplicationUser user)
         {
             // Hämtar claims kopplade till användaren från databasen.
             var userClaims = await _userManager.GetClaimsAsync(user);
@@ -208,19 +230,89 @@ namespace GameStatistics.Services
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
 
             // Definierar signeringsuppgifterna (HMAC-SHA256) med den säkerhetsnyckeln.
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
 
             // Skapar själva JWT-token med nödvändiga inställningar.
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"], // Issuer (vem som skapade och signerade token).
                 audience: _configuration["Jwt:Audience"], // Audience (vilka som får använda token).
                 claims: claims, // De claims som token innehåller.
-                expires: DateTime.Now.AddHours(1), // Tokenens giltighetstid (1 timme).
+                expires: DateTime.Now.AddMinutes(1), // Tokenens giltighetstid  ÄNDRA!!!!
                 signingCredentials: creds // Signeringsuppgifterna för att verifiera tokenens äkthet.
             );
 
+            var refreshToken = GenerateRefreshToken();
+
             // Returnerar den genererade JWT-token som en sträng.
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return (new JwtSecurityTokenHandler().WriteToken(token), refreshToken);
+        }
+
+        public string CreateToken(ApplicationUser user)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(JwtRegisteredClaimNames.GivenName, user.UserName)
+            };
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.Now.AddDays(7),
+                SigningCredentials = creds,
+                Issuer = _configuration["Jwt:Issuer"],
+                Audience = _configuration["Jwt:Audience"]
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            return tokenHandler.WriteToken(token);
+        }
+
+        public string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            
+            using(var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+            }
+            return Convert.ToBase64String(randomNumber);
+        }
+
+        public async Task StoreRefreshToken(ApplicationUser user, string refreshToken)
+        {
+            var existingToken = await _context.UserTokens
+                .FirstOrDefaultAsync(t => t.UserId == user.Id && t.LoginProvider == "RefreshToken");
+
+            if (existingToken != null)
+                existingToken.Value = refreshToken;
+            else
+            {
+                var newToken = new IdentityUserToken<string>
+                {
+                    UserId = user.Id,
+                    LoginProvider = "RefreshToken",
+                    Name = "RefreshToken",
+                    Value = refreshToken
+                };
+                _context.UserTokens.Add(newToken);
+                await _context.SaveChangesAsync();
+            }
+
+        }
+
+        public async Task<bool> ValidateRefreshToken(ApplicationUser user, string refreshToken)
+        {
+            var storedToken = await _context.UserTokens
+                .FirstOrDefaultAsync(t => t.UserId == user.Id && t.LoginProvider == "RefreshToken");
+
+            return storedToken != null && storedToken.Value == refreshToken;
         }
     }
 }

@@ -1,13 +1,14 @@
 ﻿using GameStatistics.DTO;
 using GameStatistics.Interfaces;
 using GameStatistics.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GameStatistics.Controllers
 {
-	[Route("api/[controller]")]
+	[Route("api/[controller]/[action]")]
 	[ApiController]
 	public class GameStatisticsController : ControllerBase
 	{
@@ -32,16 +33,17 @@ namespace GameStatistics.Controllers
 			}
 		}
 
-		[HttpGet]
+/*		[HttpGet("getall")]
 		public async Task<IActionResult> GetAll()
 		{
 			var allStats = await _service.GetAll();
 			if (allStats == null)
 				return NotFound("No data available in database");
 			return Ok(allStats);
-		}
+		}*/
 
 		[HttpGet]
+		[Authorize]
 		public async Task<IActionResult> GetStatistics()
 		{
 			var averageVisits = await _service.GetAverageVisits();
@@ -66,6 +68,19 @@ namespace GameStatistics.Controllers
 				return BadRequest("Invalid workshop data.");
 
 			var updatedStats = await _service.UpdateWorkshop(dto);
+			if (updatedStats == null)
+				return NotFound($"Workshop with ID {dto.Id} was not found");
+
+			return Ok(updatedStats);
+		}		
+		
+		[HttpPut]
+		public IActionResult UpdateStatistics2([FromBody] UpdateWorkshopDTO dto)
+		{
+			if (dto == null || dto.Id <= 0)
+				return BadRequest("Invalid workshop data.");
+
+			var updatedStats =  _service.UpdateWorkshop2(dto);
 			if (updatedStats == null)
 				return NotFound($"Workshop with ID {dto.Id} was not found");
 

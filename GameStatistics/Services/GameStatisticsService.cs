@@ -85,7 +85,20 @@ namespace GameStatistics.Services
 			return workshopStats;
 		}
 
-		public async Task<Workshop?> DeleteStatistics(int id)
+        public Workshop UpdateWorkshop2(UpdateWorkshopDTO dto)
+        {
+            var workshopStats = _context.Workshops.FirstOrDefault(w => w.Id == dto.Id);
+            if (workshopStats == null)
+                return null;
+
+            workshopStats.WorkShopVisits = dto.WorkShopVisits;
+            workshopStats.TotalWorkshopTimeInSeconds = dto.TotalWorkshopTimeInSeconds;
+            //_context.Update(workshopStats);
+            _context.SaveChanges();
+            return workshopStats;
+        }
+
+        public async Task<Workshop?> DeleteStatistics(int id)
 		{
 			var stats = await _context.Workshops.FirstOrDefaultAsync(w => w.Id == id);
 

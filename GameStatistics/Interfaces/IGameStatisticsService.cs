@@ -12,5 +12,7 @@ namespace GameStatistics.Interfaces
 		Task<Workshop?> DeleteStatistics(int id);
 		Task<List<Workshop>?> GetAll();
 		Task<Workshop?> UpdateWorkshop(UpdateWorkshopDTO dto);
-	}
+		Workshop UpdateWorkshop2(UpdateWorkshopDTO dto);
+
+    }
 }
