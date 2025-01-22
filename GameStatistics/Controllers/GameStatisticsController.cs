@@ -46,7 +46,12 @@ namespace GameStatistics.Controllers
 		[Authorize]
 		public async Task<IActionResult> GetStatistics()
 		{
-			var averageVisits = await _service.GetAverageVisits();
+			var statistics = await _service.GetAverageVisits();
+			if (statistics == null)
+				return BadRequest("No data available to calculate statistics.");
+			return Ok(statistics);
+
+			/*var averageVisits = await _service.GetAverageVisits();
 			var averageTime = await _service.GetAverageTime();
 
 			var medianVisits = await _service.GetMedianVisits();
@@ -58,35 +63,22 @@ namespace GameStatistics.Controllers
 
 			return Ok($"Average workshop visits: {averageVisits}" +
 				$"\nMedian of workshop visits: {medianVisits}" +
-				$"\nAverage time spent in workshop: {averageTime}");
+				$"\nAverage time spent in workshop: {averageTime}");*/
 		}
 
-		[HttpPut]
-		public async Task<IActionResult> UpdateStatistics([FromBody] UpdateWorkshopDTO dto)
+		[HttpPut("{id}")]
+		public async Task<IActionResult> UpdateStatistics([FromBody] UpdateWorkshopDTO dto, int id)
 		{
-			if (dto == null || dto.Id <= 0)
+			if (dto == null || id <= 0)
 				return BadRequest("Invalid workshop data.");
 
-			var updatedStats = await _service.UpdateWorkshop(dto);
+			var updatedStats = await _service.UpdateWorkshop(dto, id);
 			if (updatedStats == null)
-				return NotFound($"Workshop with ID {dto.Id} was not found");
+				return NotFound($"Workshop with ID {id} was not found");
 
 			return Ok(updatedStats);
 		}		
 		
-		[HttpPut]
-		public IActionResult UpdateStatistics2([FromBody] UpdateWorkshopDTO dto)
-		{
-			if (dto == null || dto.Id <= 0)
-				return BadRequest("Invalid workshop data.");
-
-			var updatedStats =  _service.UpdateWorkshop2(dto);
-			if (updatedStats == null)
-				return NotFound($"Workshop with ID {dto.Id} was not found");
-
-			return Ok(updatedStats);
-		}
-
 		[HttpDelete]
 		public async Task<IActionResult> DeleteStatistics(int id)
 		{

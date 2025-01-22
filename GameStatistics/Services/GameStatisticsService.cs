@@ -32,13 +32,27 @@ namespace GameStatistics.Services
 			return workshop;
 		}
 
-		public async Task<double> GetAverageVisits()
+		public async Task<string?> GetAverageVisits()
 		{
 			if (!await _context.Workshops.AnyAsync())
+				return null;
+
+			var visits = await _context.Workshops
+				.AverageAsync(w => w.WorkShopVisits);
+			var time = await _context.Workshops
+				.AverageAsync(w => w.TotalWorkshopTimeInSeconds);
+			var medianVisits = await GetMedianVisits();
+
+			string avarageStats = $"Avarage workshop visits: {visits} \n" +
+				$"Median of workshop visits: {medianVisits}\n" +
+				$"Average time spent in workshop: {time}";
+			return avarageStats;
+
+		/*	if (!await _context.Workshops.AnyAsync())
 				return 0;
 
 			return await _context.Workshops
-				.AverageAsync(w => w.WorkShopVisits);
+				.AverageAsync(w => w.WorkShopVisits);*/
 		}
 
 		public async Task<double> GetAverageTime()
@@ -72,9 +86,9 @@ namespace GameStatistics.Services
 			}
 		}
 
-		public async Task<Workshop?> UpdateWorkshop(UpdateWorkshopDTO dto)
+		public async Task<Workshop?> UpdateWorkshop(UpdateWorkshopDTO dto, int id)
 		{
-			var workshopStats = await _context.Workshops.FirstOrDefaultAsync(w => w.Id == dto.Id);
+			var workshopStats = await _context.Workshops.FirstOrDefaultAsync(w => w.Id == id);
 			if (workshopStats == null)
 				return null;
 
@@ -84,19 +98,6 @@ namespace GameStatistics.Services
 			await _context.SaveChangesAsync();
 			return workshopStats;
 		}
-
-        public Workshop UpdateWorkshop2(UpdateWorkshopDTO dto)
-        {
-            var workshopStats = _context.Workshops.FirstOrDefault(w => w.Id == dto.Id);
-            if (workshopStats == null)
-                return null;
-
-            workshopStats.WorkShopVisits = dto.WorkShopVisits;
-            workshopStats.TotalWorkshopTimeInSeconds = dto.TotalWorkshopTimeInSeconds;
-            //_context.Update(workshopStats);
-            _context.SaveChanges();
-            return workshopStats;
-        }
 
         public async Task<Workshop?> DeleteStatistics(int id)
 		{

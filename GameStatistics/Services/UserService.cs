@@ -160,9 +160,27 @@ namespace GameStatistics.Services
             return updatedUserDto;
         }
 
-        public async Task<IdentityResult?> DeleteUser(string id)
+		public async Task<bool> DeleteService(string? currentUserRole, string? currentUserId, int id)
+		{
+            if (currentUserRole == "Admin")
+            {
+				var deleteAdmin = await DeleteUserAdmin(id);
+                if (deleteAdmin == null)
+                    return false;
+                return true;
+			}
+            else
+            {
+                var deleteUser = await DeleteUser(currentUserId);
+                if (deleteUser == null) 
+                    return false;
+                return true;
+            }
+		}
+
+		public async Task<IdentityResult?> DeleteUser(string? id)
         {
-            var user = await _userManager.FindByIdAsync(id.ToString());
+            var user = await _userManager.FindByIdAsync(id);
             if (user == null)
                 return null;
             var result = await _userManager.DeleteAsync(user);
@@ -181,7 +199,6 @@ namespace GameStatistics.Services
                 return null;
             return result;
         }
-
 
         public async Task<ApplicationUser?> GetUserByUsername(string username)
         {
@@ -304,7 +321,6 @@ namespace GameStatistics.Services
                 _context.UserTokens.Add(newToken);
                 await _context.SaveChangesAsync();
             }
-
         }
 
         public async Task<bool> ValidateRefreshToken(ApplicationUser user, string refreshToken)
@@ -314,5 +330,6 @@ namespace GameStatistics.Services
 
             return storedToken != null && storedToken.Value == refreshToken;
         }
-    }
+
+	}
 }

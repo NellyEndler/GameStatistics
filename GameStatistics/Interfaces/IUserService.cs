@@ -19,8 +19,9 @@ namespace GameStatistics.Interfaces
         Task <List<ShowUserDTO>?> GetAllUsers(string? role);
         //public Task <List<ApplicationUser>?> GetAllAdmins();
         Task<UpdateUserDTO?> UpdateUser(UpdateUserDTO dto, int id);
-        Task<IdentityResult?> DeleteUser (string id);
+        Task<IdentityResult?> DeleteUser (string? id);
         Task<IdentityResult?> DeleteUserAdmin (int id);
+        Task <bool> DeleteService (string? currentUserRole, string? currentUserId, int id);
 
         string CreateToken(ApplicationUser user);
     }

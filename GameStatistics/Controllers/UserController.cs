@@ -66,7 +66,6 @@ namespace GameStatistics.Controllers
 
                 var (token, refreshToken) = await _service.GenerateJwtToken(user);
                 await _service.StoreRefreshToken(user, refreshToken);
-                //var token = _service.CreateToken(user);
 
                 return Ok(new
                 {
@@ -136,22 +135,11 @@ namespace GameStatistics.Controllers
 
             var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
             var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var delete = await _service.DeleteService(currentUserRole, currentUserId, id);
 
-            if (currentUserRole == "Admin")
-            {
-                var deleteUserAdmin = await _service.DeleteUserAdmin(id);
-                if (deleteUserAdmin == null)
-                    return NotFound($"Could not find user with ID {id} to delete.");
-                return Ok($"User with ID {id} successfully deleted.");
-            }
-            else
-            {
-                var deleteUser = await _service.DeleteUser(currentUserId);
-                if(deleteUser == null)
-                    return NotFound($"Could not find user with ID {id} to delete.");
-                return Ok($"User with ID {id} successfully deleted.");
-            }
-
+            if (!delete)
+                return NotFound($"$Could not find user with ID {id} to delete.");
+            return Ok($"User with ID {id} successfully deleted.");
         }
     }
 }
