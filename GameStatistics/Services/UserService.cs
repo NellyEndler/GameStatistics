@@ -1,6 +1,7 @@
 ﻿using GameStatistics.Context;
 using GameStatistics.DTO;
 using GameStatistics.Interfaces;
+using GameStatistics.Models;
 using GameStatistics.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+#pragma warning disable CS8604 // Possible null reference argument.
 
 namespace GameStatistics.Services
 {
@@ -264,7 +266,7 @@ namespace GameStatistics.Services
             return (new JwtSecurityTokenHandler().WriteToken(token), refreshToken);
         }
 
-        public string CreateToken(ApplicationUser user)
+/*        public string CreateToken(ApplicationUser user)
         {
             var claims = new List<Claim>
             {
@@ -289,7 +291,7 @@ namespace GameStatistics.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(token);
-        }
+        }*/
 
         public string GenerateRefreshToken()
         {
@@ -304,31 +306,36 @@ namespace GameStatistics.Services
 
         public async Task StoreRefreshToken(ApplicationUser user, string refreshToken)
         {
-            var existingToken = await _context.UserTokens
-                .FirstOrDefaultAsync(t => t.UserId == user.Id && t.LoginProvider == "RefreshToken");
+            var existingToken = await _context.RefreshTokens
+                .Where(x => x.UserId.ToString() == user.Id)
+                .FirstOrDefaultAsync();
 
             if (existingToken != null)
-                existingToken.Value = refreshToken;
+            {
+                existingToken.Token = refreshToken;
+                await _context.SaveChangesAsync();
+            }
             else
             {
-                var newToken = new IdentityUserToken<string>
+                var newToken = new RefreshToken
                 {
+                    Token = refreshToken,
                     UserId = user.Id,
-                    LoginProvider = "RefreshToken",
-                    Name = "RefreshToken",
-                    Value = refreshToken
+                    Expires = DateTime.Now.AddHours(1),
                 };
-                _context.UserTokens.Add(newToken);
+
+                _context.RefreshTokens.Add(newToken);
                 await _context.SaveChangesAsync();
             }
         }
 
         public async Task<bool> ValidateRefreshToken(ApplicationUser user, string refreshToken)
         {
-            var storedToken = await _context.UserTokens
-                .FirstOrDefaultAsync(t => t.UserId == user.Id && t.LoginProvider == "RefreshToken");
+            var storedToken = await _context.RefreshTokens
+                .Where(t => t.UserId == user.Id)
+                .FirstOrDefaultAsync();
 
-            return storedToken != null && storedToken.Value == refreshToken;
+            return storedToken != null && storedToken.Token == refreshToken;
         }
 
 	}

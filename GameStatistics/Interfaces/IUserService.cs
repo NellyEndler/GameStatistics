@@ -23,6 +23,6 @@ namespace GameStatistics.Interfaces
         Task<IdentityResult?> DeleteUserAdmin (int id);
         Task <bool> DeleteService (string? currentUserRole, string? currentUserId, int id);
 
-        string CreateToken(ApplicationUser user);
-    }
+/*        string CreateToken(ApplicationUser user);
+*/    }
 }

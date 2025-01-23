@@ -14,6 +14,12 @@ namespace GameStatistics.Controllers
     {
         private readonly IUserService _service = service;
 
+        [HttpGet]
+        public IActionResult Ping()
+        {
+            return Ok("Im alive!");
+        }
+
         [HttpPost]
         public async Task<IActionResult> RegisterUser([FromBody] UserDTO dto)
         {
@@ -79,7 +85,7 @@ namespace GameStatistics.Controllers
         }
 
         [HttpPost]
-        public async Task <IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+        public async Task <IActionResult> RefreshToken([FromBody] RefreshTokenDTO request)
         {
             if (string.IsNullOrEmpty(request.UserId) || string.IsNullOrEmpty(request.RefreshToken))
                 return BadRequest("Invalid data");

@@ -1,6 +1,6 @@
-﻿namespace GameStatistics.Models
+﻿namespace GameStatistics.DTO
 {
-    public class RefreshTokenRequest
+    public class RefreshTokenDTO
     {
         public string? UserId { get; set; }
         public string? RefreshToken { get; set; }
