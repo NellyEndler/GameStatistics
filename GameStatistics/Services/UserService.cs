@@ -4,7 +4,6 @@ using GameStatistics.Interfaces;
 using GameStatistics.Models;
 using GameStatistics.Models.Identity;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -41,31 +40,13 @@ namespace GameStatistics.Services
             var userDtos = filteredUsers.Select(user => new ShowUserDTO
             {
                 Username = user.UserName,
-                Email = user.Email
             }).ToList();
 
             return userDtos;
         }
 
-/*        public async Task<List<ApplicationUser>?> GetAllAdmins()
-        {
-            var adminUsers = new List<ApplicationUser>();
-            var users = await _userManager.Users.ToListAsync();
-            if (users == null)
-                return null;
-
-            foreach (var user in users)
-            {
-                if (await _userManager.IsInRoleAsync(user, "Admin"))
-                    adminUsers.Add(user);
-            }
-            return adminUsers;
-        }*/
-
-
         public async Task<Microsoft.AspNetCore.Identity.SignInResult> LoginUser(LoginDTO dto)
         {
-           // var loginUser1 = await _signInManager.PasswordSignInAsync(dto.UserName, dto.Password, false, false);
 
             var loginUser = await _userManager.FindByNameAsync(dto.UserName);
 
@@ -73,13 +54,25 @@ namespace GameStatistics.Services
                 return Microsoft.AspNetCore.Identity.SignInResult.Failed;
 
             var loginResult = await _signInManager.CheckPasswordSignInAsync(loginUser, dto.Password, false);
-            //var validPassword = await _userManager.CheckPasswordAsync(loginUser, dto.Password);
 
-            if(loginResult != null)
+            if (loginResult != null)
                 return Microsoft.AspNetCore.Identity.SignInResult.Success;
 
             return Microsoft.AspNetCore.Identity.SignInResult.Failed;
         }
+
+        public async Task<bool> SignOut(string userId)
+        {
+            var refreshToken = await _context.RefreshTokens.Where(t => t.UserId == userId).FirstOrDefaultAsync();
+
+            if (refreshToken == null)
+                return false;
+
+            refreshToken.Expires = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
 
         public async Task<IdentityResult?> RegisterAdmin(UserDTO dto)
         {
@@ -129,16 +122,29 @@ namespace GameStatistics.Services
             return result;
         }
 
-        public async Task<UpdateUserDTO?> UpdateUser(UpdateUserDTO dto, int id)
+        public async Task<IdentityResult?> UpdateUser(UpdateUserDTO dto, string? id)
         {
-            var user = await _userManager.FindByIdAsync(id.ToString());
+            var user = await _userManager.FindByIdAsync(id);
+
             if (user == null)
                 return null;
 
-            user.FirstName = dto.FirstName;
-            user.LastName = dto.LastName;
+            var result = await _userManager.ChangePasswordAsync(user, dto.OldPassword, dto.NewPassword);
+
+            if (!result.Succeeded)
+                return null;
+
+            return result;
+        }
+
+        public async Task<UpdateAdminDTO?> UpdateAdmin(UpdateAdminDTO dto, string? id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user == null)
+                return null;
+
             user.UserName = dto.Username;
-            user.PasswordHash = dto.Username;
             user.Email = dto.Email;
 
             var roles = await _userManager.GetRolesAsync(user);
@@ -149,12 +155,9 @@ namespace GameStatistics.Services
             if (!result.Succeeded)
                 return null;
 
-            var updatedUserDto = new UpdateUserDTO
+            var updatedUserDto = new UpdateAdminDTO
             {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
                 Username = user.UserName,
-                Password = user.PasswordHash,
                 Email = user.Email,
                 Role = dto.Role
             };
@@ -162,25 +165,25 @@ namespace GameStatistics.Services
             return updatedUserDto;
         }
 
-		public async Task<bool> DeleteService(string? currentUserRole, string? currentUserId, int id)
-		{
+        public async Task<bool> DeleteService(string? currentUserRole, string? currentUserId, int id)
+        {
             if (currentUserRole == "Admin")
             {
-				var deleteAdmin = await DeleteUserAdmin(id);
+                var deleteAdmin = await DeleteUserAdmin(id);
                 if (deleteAdmin == null)
                     return false;
                 return true;
-			}
+            }
             else
             {
                 var deleteUser = await DeleteUser(currentUserId);
-                if (deleteUser == null) 
+                if (deleteUser == null)
                     return false;
                 return true;
             }
-		}
+        }
 
-		public async Task<IdentityResult?> DeleteUser(string? id)
+        public async Task<IdentityResult?> DeleteUser(string? id)
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
@@ -211,6 +214,12 @@ namespace GameStatistics.Services
             return user;
         }
 
+        public async Task<string> GetUserId(ApplicationUser user)
+        {
+            var userId = await _userManager.GetUserIdAsync(user);
+            return userId;
+        }
+
         public async Task<ApplicationUser?> GetUserById(string id)
         {
             var user = await _userManager.FindByIdAsync($"{id}");
@@ -235,7 +244,7 @@ namespace GameStatistics.Services
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName), // Lägg till användarnamn som "subject" (standardfält i JWT).
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // Skapar en unik identifierare för token.
-                new Claim(ClaimTypes.NameIdentifier, user.Id), // Lägg till användarens unika ID.
+                new Claim("UserId", user.Id), // Lägg till användarens unika ID.
                 new Claim(ClaimTypes.Email, user.Email) // Lägg till användarens e-postadress.
             };
 
@@ -266,38 +275,11 @@ namespace GameStatistics.Services
             return (new JwtSecurityTokenHandler().WriteToken(token), refreshToken);
         }
 
-/*        public string CreateToken(ApplicationUser user)
-        {
-            var claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(JwtRegisteredClaimNames.GivenName, user.UserName)
-            };
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(7),
-                SigningCredentials = creds,
-                Issuer = _configuration["Jwt:Issuer"],
-                Audience = _configuration["Jwt:Audience"]
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-
-            return tokenHandler.WriteToken(token);
-        }*/
-
         public string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
-            
-            using(var rng = RandomNumberGenerator.Create())
+
+            using (var rng = RandomNumberGenerator.Create())
             {
                 rng.GetBytes(randomNumber);
             }
@@ -313,6 +295,7 @@ namespace GameStatistics.Services
             if (existingToken != null)
             {
                 existingToken.Token = refreshToken;
+                existingToken.Expires = DateTime.Now.AddHours(1);
                 await _context.SaveChangesAsync();
             }
             else
@@ -338,5 +321,5 @@ namespace GameStatistics.Services
             return storedToken != null && storedToken.Token == refreshToken;
         }
 
-	}
+    }
 }

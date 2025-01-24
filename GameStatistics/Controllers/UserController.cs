@@ -34,8 +34,8 @@ namespace GameStatistics.Controllers
                 return BadRequest($"Failed to create user {result}");
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-        [Authorize]
         public async Task<IActionResult> RegisterAdmin([FromBody] UserDTO dto)
         {
             if (!ModelState.IsValid)
@@ -49,8 +49,8 @@ namespace GameStatistics.Controllers
                 return BadRequest($"Failed to create user {result}");
         }
 
-        [HttpGet]
         [Authorize]
+        [HttpGet]
         public IActionResult Protected()
         {
             return Ok("Välkommen");
@@ -84,6 +84,7 @@ namespace GameStatistics.Controllers
                 return Unauthorized("Invalid login attempt");
         }
 
+        [Authorize]
         [HttpPost]
         public async Task <IActionResult> RefreshToken([FromBody] RefreshTokenDTO request)
         {
@@ -110,7 +111,7 @@ namespace GameStatistics.Controllers
             });
         }
 
-        [Authorize(Roles = "User")]
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllUsers([FromQuery] string? role)
         {
@@ -120,20 +121,58 @@ namespace GameStatistics.Controllers
             return Ok(users);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDTO dto, int id)
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> SignOutUser()
         {
-            if (dto == null || id <= 0)
-                return BadRequest("Invalid user data.");
+            var userId = User.FindFirst("UserId")?.Value;
 
-            var updatedUser = await _service.UpdateUser(dto, id);
-            if (updatedUser == null)
-                return BadRequest("Could not update user.");
-            return Ok(updatedUser);
+            if (userId == null)
+                return Unauthorized();
+
+            var result = await _service.SignOut(userId);
+            if (!result)
+                return NotFound("No refresh token found in database");
+
+            return Ok("Signed out successfully");
         }
 
-        [HttpDelete("{id}")]
         [Authorize]
+        [HttpPut]
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDTO dto)
+        {
+            if (dto == null)
+                return BadRequest("Invalid user data.");
+
+            var userId = User.FindFirst("UserId")?.Value;
+
+            if (userId == null)
+                return Unauthorized();
+
+            var updatedUser = await _service.UpdateUser(dto, userId);
+
+            if (updatedUser == null || !updatedUser.Succeeded)
+                return BadRequest("Could not update user.");
+
+            return Ok($"Following field was updated:\n{updatedUser}");
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{userId}")]
+        public async Task<IActionResult> UpdateAdmin([FromBody] UpdateAdminDTO dto, string userId)
+        {
+            if (dto == null)
+                return BadRequest("Invalid user data");
+
+            var updatedUser = await _service.UpdateAdmin(dto, userId);
+
+            if(updatedUser == null)
+                return NotFound($"User with ID {userId} was not found.");
+            return Ok($"Updated fields:\n{updatedUser}");
+        }
+
+        [Authorize]
+        [HttpDelete("{id}")]
         public async Task <IActionResult> DeleteUser(int id)
         {
             if (id <= 0)
