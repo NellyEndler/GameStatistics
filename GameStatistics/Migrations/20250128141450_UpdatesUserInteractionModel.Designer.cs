@@ -4,6 +4,7 @@ using GameStatistics.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GameStatistics.Migrations
 {
     [DbContext(typeof(GameStatisticsContext))]
-    partial class GameStatisticsContextModelSnapshot : ModelSnapshot
+    [Migration("20250128141450_UpdatesUserInteractionModel")]
+    partial class UpdatesUserInteractionModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -318,7 +321,7 @@ namespace GameStatistics.Migrations
 
             modelBuilder.Entity("GameStatistics.Models.UserInteraction", b =>
                 {
-                    b.HasOne("GameStatistics.Models.InteractionPoint", "InteractionPoint")
+                    b.HasOne("GameStatistics.Models.InteractionPoint", null)
                         .WithMany()
                         .HasForeignKey("InteractionPointId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -328,8 +331,6 @@ namespace GameStatistics.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("InteractionPoint");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

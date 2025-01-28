@@ -5,10 +5,10 @@ namespace GameStatistics.Interfaces
 {
     public interface IGameStatisticsService
     {
-		Task <Workshop>AddGameStatistics(WorkshopDTO workshopStats);
-		Task <string?> GetAverageVisits();
+		Task <UserInteraction>AddGameStatistics(UserInteractionDTO userInteraction, string userId);
+		Task <string?> GetAverageVisits(string interactionPointName);
 		Task <double> GetAverageTime();
-		Task <double> GetMedianVisits();
+		Task <double> GetMedianVisits(string interactionPointName);
 		Task<Workshop?> DeleteStatistics(int id);
 		Task<List<Workshop>?> GetAll();
 		Task<Workshop?> UpdateWorkshop(UpdateWorkshopDTO dto, int id);

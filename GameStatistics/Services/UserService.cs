@@ -55,7 +55,7 @@ namespace GameStatistics.Services
 
             var loginResult = await _signInManager.CheckPasswordSignInAsync(loginUser, dto.Password, false);
 
-            if (loginResult != null)
+            if (loginResult.Succeeded)
                 return Microsoft.AspNetCore.Identity.SignInResult.Success;
 
             return Microsoft.AspNetCore.Identity.SignInResult.Failed;
@@ -68,7 +68,7 @@ namespace GameStatistics.Services
             if (refreshToken == null)
                 return false;
 
-            refreshToken.Expires = DateTime.UtcNow;
+            refreshToken.Expires = DateTime.Now;
             await _context.SaveChangesAsync();
             return true;
         }
@@ -129,6 +129,8 @@ namespace GameStatistics.Services
             if (user == null)
                 return null;
 
+            var test1 = await _userManager.HasPasswordAsync(user);
+            var test = await _userManager.CheckPasswordAsync(user, dto.OldPassword);
             var result = await _userManager.ChangePasswordAsync(user, dto.OldPassword, dto.NewPassword);
 
             if (!result.Succeeded)
@@ -317,6 +319,10 @@ namespace GameStatistics.Services
             var storedToken = await _context.RefreshTokens
                 .Where(t => t.UserId == user.Id)
                 .FirstOrDefaultAsync();
+
+            if(storedToken != null)
+                if (storedToken.Expires <= DateTime.Now)
+                    return false;
 
             return storedToken != null && storedToken.Token == refreshToken;
         }

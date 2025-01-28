@@ -1,8 +1,6 @@
 ﻿using GameStatistics.DTO;
 using GameStatistics.Interfaces;
-using GameStatistics.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -75,6 +73,7 @@ namespace GameStatistics.Controllers
 
                 return Ok(new
                 {
+                    user.Id,
                     AccessToken = token,
                     RefreshToken = refreshToken,
                     Message = "Login successfull"
@@ -86,22 +85,24 @@ namespace GameStatistics.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task <IActionResult> RefreshToken([FromBody] RefreshTokenDTO request)
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDTO request)
         {
-            if (string.IsNullOrEmpty(request.UserId) || string.IsNullOrEmpty(request.RefreshToken))
+            var userId = User.FindFirst("UserId")?.Value;
+
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(request.RefreshToken))
                 return BadRequest("Invalid data");
 
-            var user = await _service.GetUserById(request.UserId);
+            var user = await _service.GetUserById(userId);
 
             if (user == null)
                 return Unauthorized("Invalid user.");
 
             var isValid = await _service.ValidateRefreshToken(user, request.RefreshToken);
-            if(!isValid)
+            if (!isValid)
                 return Unauthorized();
 
             var newJwtToken = await _service.GenerateJwtToken(user);
-            var newRefreshToken =  _service.GenerateRefreshToken();
+            var newRefreshToken = _service.GenerateRefreshToken();
 
             await _service.StoreRefreshToken(user, newRefreshToken);
             return Ok(new
@@ -166,20 +167,20 @@ namespace GameStatistics.Controllers
 
             var updatedUser = await _service.UpdateAdmin(dto, userId);
 
-            if(updatedUser == null)
+            if (updatedUser == null)
                 return NotFound($"User with ID {userId} was not found.");
             return Ok($"Updated fields:\n{updatedUser}");
         }
 
         [Authorize]
         [HttpDelete("{id}")]
-        public async Task <IActionResult> DeleteUser(int id)
+        public async Task<IActionResult> DeleteUser(int id)
         {
             if (id <= 0)
                 return BadRequest();
 
             var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
-            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var currentUserId = User.FindFirst("UserID")?.Value;
             var delete = await _service.DeleteService(currentUserRole, currentUserId, id);
 
             if (!delete)
