@@ -19,7 +19,7 @@ namespace GameStatistics.Services
                 return allStats;
         }
 
-        public async Task<UserInteraction> AddGameStatistics(UserInteractionDTO dto, string userId)
+        public async Task<UserInteraction> AddGameStatistics(UserInteractionRequest dto, string userId)
         {
             UserInteraction userInteraction = new()
             {
@@ -44,57 +44,56 @@ namespace GameStatistics.Services
                 .Where(u => u.InteractionPoint.Name == interactionPointName)
                 .CountAsync();
 
+            var medianVisits = await GetMedianTime(interactionPointName);
+
+            string avarageStats = $"Avarage {interactionPointName} visits: {avarageVisists} \n" +
+                $"Average time spent in {interactionPointName}: {avarageTime}\n" +
+                $"Median of time spent in {interactionPointName}: {medianVisits}";
                 
-
-           /* if (!await _context.Workshops.AnyAsync())
-                return null;
-
-            var visits = await _context.Workshops
-                .AverageAsync(w => w.WorkShopVisits);
-            var time = await _context.Workshops
-                .AverageAsync(w => w.TotalWorkshopTimeInSeconds);
-            var medianVisits = await GetMedianVisits();*/
-
-            string avarageStats = $"Avarage workshop visits: {avarageVisists} \n" +
-                $"Median of workshop visits: {medianVisits}\n" +
-                $"Average time spent in workshop: {avarageTime}";
             return avarageStats;
         }
 
-        public async Task<double> GetMedianVisits(string interactionPointName)
+        public async Task<double> GetMedianTime(string interactionPointName)
         {
-            //var stats = await _context.Workshops.Select(w => w.WorkShopVisits).ToListAsync();
-            var stats = await _context.UserInteractions
+            var interactions = await _context.UserInteractions
                 .Where(u => u.InteractionPoint.Name == interactionPointName)
+                .Select(u => u.InteractionTimeInSeconds)
                 .ToListAsync();
 
-            if (stats == null)
+            if (interactions == null)
                 return 0;
 
-            stats.Sort();
-            int count = stats.Count;
+            interactions.Sort();
+            int count = interactions.Count;
 
             //if count is odd, return the middle value
             if (count % 2 == 1)
-                return stats[count / 2];
+            {
+                var medianOdd = interactions[count/2];
+                return medianOdd;
+            }
+            if (count == 2)
+            {
+                var middleValue = interactions[0] + interactions[1] / 2;
+                return middleValue;
+            }
             else
             {
-                //If count is even, calculate the average of the two middle numbers
-                double middle1 = stats[(count / 2) - 1];
-                double middle2 = stats[(count / 2)];
+                double middle1 = (count / 2) - 1;
+                double middle2 = (count / 2);
                 return (middle1 + middle2) / 2;
             }
         }
 
-        public async Task<Workshop?> UpdateWorkshop(UpdateWorkshopDTO dto, int id)
+        public async Task<Workshop?> UpdateWorkshop(UpdateWorkshopRquest dto, int id)
         {
             var workshopStats = await _context.Workshops.FirstOrDefaultAsync(w => w.Id == id);
+
             if (workshopStats == null)
                 return null;
 
             workshopStats.WorkShopVisits = dto.WorkShopVisits;
             workshopStats.TotalWorkshopTimeInSeconds = dto.TotalWorkshopTimeInSeconds;
-            //_context.Update(workshopStats);
             await _context.SaveChangesAsync();
             return workshopStats;
         }

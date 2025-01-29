@@ -1,6 +1,6 @@
 ﻿namespace GameStatistics.DTO
 {
-    public class UserInteractionDTO
+    public class UserInteractionRequest
     {
         public int InteractionPointId { get; set; }
         public double InteractionTimeInSeconds { get; set; }

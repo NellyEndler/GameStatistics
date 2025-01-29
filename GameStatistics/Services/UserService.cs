@@ -20,15 +20,14 @@ namespace GameStatistics.Services
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
         private readonly GameStatisticsContext _context = contex;
-        private readonly IHttpContextAccessor _contextAccessor = contextAccessor;
         private readonly IConfiguration _configuration = configuration;
 
-        public async Task<List<ShowUserDTO>?> GetAllUsers(string? role)
+        public async Task<List<UserResponse>?> GetAllUsers(string? role)
         {
             var users = await _userManager.Users.ToListAsync();
 
             if (users == null || users.Count == 0)
-                return new List<ShowUserDTO>();
+                return [];
 
             List<ApplicationUser> filteredUsers;
 
@@ -37,28 +36,28 @@ namespace GameStatistics.Services
             else
                 filteredUsers = users.Where(user => _userManager.IsInRoleAsync(user, role).Result).ToList();
 
-            var userDtos = filteredUsers.Select(user => new ShowUserDTO
+            var userResponse = filteredUsers.Select(user => new UserResponse
             {
                 Username = user.UserName,
             }).ToList();
 
-            return userDtos;
+            return userResponse;
         }
 
-        public async Task<Microsoft.AspNetCore.Identity.SignInResult> LoginUser(LoginDTO dto)
+        public async Task<SignInResult> LoginUser(LoginRequest request)
         {
 
-            var loginUser = await _userManager.FindByNameAsync(dto.UserName);
+            var loginUser = await _userManager.FindByNameAsync(request.UserName);
 
             if (loginUser == null)
-                return Microsoft.AspNetCore.Identity.SignInResult.Failed;
+                return SignInResult.Failed;
 
-            var loginResult = await _signInManager.CheckPasswordSignInAsync(loginUser, dto.Password, false);
+            var loginResult = await _signInManager.CheckPasswordSignInAsync(loginUser, request.Password, false);
 
             if (loginResult.Succeeded)
-                return Microsoft.AspNetCore.Identity.SignInResult.Success;
+                return SignInResult.Success;
 
-            return Microsoft.AspNetCore.Identity.SignInResult.Failed;
+            return SignInResult.Failed;
         }
 
         public async Task<bool> SignOut(string userId)
@@ -74,17 +73,17 @@ namespace GameStatistics.Services
         }
 
 
-        public async Task<IdentityResult?> RegisterAdmin(UserDTO dto)
+        public async Task<IdentityResult?> RegisterAdmin(UserRequest request)
         {
             var userModel = new ApplicationUser
             {
-                FirstName = dto.FirstName,
-                LastName = dto.LastName,
-                UserName = dto.Username,
-                Email = dto.Email,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                UserName = request.Username,
+                Email = request.Email,
             };
 
-            var result = await _userManager.CreateAsync(userModel, dto.Password);
+            var result = await _userManager.CreateAsync(userModel, request.Password);
             if (result.Succeeded)
             {
                 var roleResult = await _userManager.AddToRoleAsync(userModel, "Admin");
@@ -98,17 +97,17 @@ namespace GameStatistics.Services
             return result;
         }
 
-        public async Task<IdentityResult?> RegisterUser(UserDTO dto)
+        public async Task<IdentityResult?> RegisterUser(UserRequest request)
         {
             var userModel = new ApplicationUser
             {
-                FirstName = dto.FirstName,
-                LastName = dto.LastName,
-                UserName = dto.Username,
-                Email = dto.Email
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                UserName = request.Username,
+                Email = request.Email
             };
 
-            var result = await _userManager.CreateAsync(userModel, dto.Password);
+            var result = await _userManager.CreateAsync(userModel, request.Password);
             if (result.Succeeded)
             {
                 var roleResult = await _userManager.AddToRoleAsync(userModel, "User");
@@ -122,7 +121,7 @@ namespace GameStatistics.Services
             return result;
         }
 
-        public async Task<IdentityResult?> UpdateUser(UpdateUserDTO dto, string? id)
+        public async Task<IdentityResult?> UpdateUser(UpdateUserRequest request, string? id)
         {
             var user = await _userManager.FindByIdAsync(id);
 
@@ -130,8 +129,8 @@ namespace GameStatistics.Services
                 return null;
 
             var test1 = await _userManager.HasPasswordAsync(user);
-            var test = await _userManager.CheckPasswordAsync(user, dto.OldPassword);
-            var result = await _userManager.ChangePasswordAsync(user, dto.OldPassword, dto.NewPassword);
+            var test = await _userManager.CheckPasswordAsync(user, request.OldPassword);
+            var result = await _userManager.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
 
             if (!result.Succeeded)
                 return null;
@@ -139,29 +138,30 @@ namespace GameStatistics.Services
             return result;
         }
 
-        public async Task<UpdateAdminDTO?> UpdateAdmin(UpdateAdminDTO dto, string? id)
+        public async Task<UpdateAdminRequest?> UpdateAdmin(UpdateAdminRequest request, string? id)
         {
             var user = await _userManager.FindByIdAsync(id);
 
             if (user == null)
                 return null;
 
-            user.UserName = dto.Username;
-            user.Email = dto.Email;
+            user.UserName = request.Username;
+            user.Email = request.Email;
 
             var roles = await _userManager.GetRolesAsync(user);
             await _userManager.RemoveFromRolesAsync(user, roles);
-            await _userManager.AddToRoleAsync(user, dto.Role);
+            await _userManager.AddToRoleAsync(user, request.Role);
 
             var result = await _userManager.UpdateAsync(user);
+
             if (!result.Succeeded)
                 return null;
 
-            var updatedUserDto = new UpdateAdminDTO
+            var updatedUserDto = new UpdateAdminRequest
             {
                 Username = user.UserName,
                 Email = user.Email,
-                Role = dto.Role
+                Role = request.Role
             };
 
             return updatedUserDto;
@@ -188,9 +188,11 @@ namespace GameStatistics.Services
         public async Task<IdentityResult?> DeleteUser(string? id)
         {
             var user = await _userManager.FindByIdAsync(id);
+
             if (user == null)
                 return null;
             var result = await _userManager.DeleteAsync(user);
+
             if (!result.Succeeded)
                 return null;
             return result;
@@ -272,8 +274,7 @@ namespace GameStatistics.Services
             );
 
             var refreshToken = GenerateRefreshToken();
-
-            // Returnerar den genererade JWT-token som en sträng.
+            await StoreRefreshToken(user, refreshToken);
             return (new JwtSecurityTokenHandler().WriteToken(token), refreshToken);
         }
 

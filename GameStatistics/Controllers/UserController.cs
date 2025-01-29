@@ -19,7 +19,7 @@ namespace GameStatistics.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RegisterUser([FromBody] UserDTO dto)
+        public async Task<IActionResult> RegisterUser([FromBody] UserRequest dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -34,7 +34,7 @@ namespace GameStatistics.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<IActionResult> RegisterAdmin([FromBody] UserDTO dto)
+        public async Task<IActionResult> RegisterAdmin([FromBody] UserRequest dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -55,25 +55,23 @@ namespace GameStatistics.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> LoginUser([FromBody] LoginDTO loginDTO)
+        public async Task<IActionResult> LoginUser([FromBody] LoginRequest request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _service.LoginUser(loginDTO);
+            var result = await _service.LoginUser(request);
 
             if (result.Succeeded)
             {
-                var user = await _service.GetUserByUsername(loginDTO.UserName);
+                var user = await _service.GetUserByUsername(request.UserName);
                 if (user == null)
                     return NotFound("User not found");
 
                 var (token, refreshToken) = await _service.GenerateJwtToken(user);
-                await _service.StoreRefreshToken(user, refreshToken);
 
                 return Ok(new
                 {
-                    user.Id,
                     AccessToken = token,
                     RefreshToken = refreshToken,
                     Message = "Login successfull"
@@ -85,7 +83,7 @@ namespace GameStatistics.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDTO request)
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
             var userId = User.FindFirst("UserId")?.Value;
 
@@ -98,16 +96,14 @@ namespace GameStatistics.Controllers
                 return Unauthorized("Invalid user.");
 
             var isValid = await _service.ValidateRefreshToken(user, request.RefreshToken);
+
             if (!isValid)
                 return Unauthorized();
 
-            var newJwtToken = await _service.GenerateJwtToken(user);
-            var newRefreshToken = _service.GenerateRefreshToken();
-
-            await _service.StoreRefreshToken(user, newRefreshToken);
+            var (newAccessToken, newRefreshToken) = await _service.GenerateJwtToken(user);
             return Ok(new
             {
-                AccessToken = newJwtToken.jwtToken,
+                AccessToken = newAccessToken,
                 RefreshToken = newRefreshToken
             });
         }
@@ -140,7 +136,7 @@ namespace GameStatistics.Controllers
 
         [Authorize]
         [HttpPut]
-        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDTO dto)
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequest dto)
         {
             if (dto == null)
                 return BadRequest("Invalid user data.");
@@ -155,12 +151,12 @@ namespace GameStatistics.Controllers
             if (updatedUser == null || !updatedUser.Succeeded)
                 return BadRequest("Could not update user.");
 
-            return Ok($"Following field was updated:\n{updatedUser}");
+            return Ok();
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPut("{userId}")]
-        public async Task<IActionResult> UpdateAdmin([FromBody] UpdateAdminDTO dto, string userId)
+        public async Task<IActionResult> UpdateAdmin([FromBody] UpdateAdminRequest dto, string userId)
         {
             if (dto == null)
                 return BadRequest("Invalid user data");

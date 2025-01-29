@@ -1,6 +1,6 @@
 ﻿namespace GameStatistics.DTO
 {
-    public class ShowUserDTO
+    public class UserResponse
     {
         public string? Username { get; set; }
     }

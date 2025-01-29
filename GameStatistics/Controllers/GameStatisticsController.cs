@@ -28,13 +28,10 @@ namespace GameStatistics.Controllers
 				*/
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> SaveGameStatistics([FromBody] UserInteractionDTO userInteraction)
+        public async Task<IActionResult> SaveGameStatistics([FromBody] UserInteractionRequest userInteraction)
         {
-            var userId2 = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-
             if (userInteraction == null)
-                return BadRequest();
+                return BadRequest("Invalid parameters.");
             if (userInteraction.InteractionTimeInSeconds == 0)
                 return BadRequest("Interaction time is 0. Cannot save to the database.");
             else
@@ -45,15 +42,6 @@ namespace GameStatistics.Controllers
             }
         }
 
-        /*		[HttpGet("getall")]
-				public async Task<IActionResult> GetAll()
-				{
-					var allStats = await _service.GetAll();
-					if (allStats == null)
-						return NotFound("No data available in database");
-					return Ok(allStats);
-				}*/
-
         [HttpGet]
        // [Authorize]
         public async Task<IActionResult> GetStatistics([FromQuery] string interactionPointName)
@@ -62,24 +50,10 @@ namespace GameStatistics.Controllers
             if (statistics == null)
                 return BadRequest("No data available to calculate statistics.");
             return Ok(statistics);
-
-            /*var averageVisits = await _service.GetAverageVisits();
-			var averageTime = await _service.GetAverageTime();
-
-			var medianVisits = await _service.GetMedianVisits();
-
-			if (averageVisits == 0 || averageTime == 0)
-				return BadRequest("No data available to calculate statistics.");
-			if (medianVisits == 0)
-				return BadRequest("No data available to calculate statistics.");
-
-			return Ok($"Average workshop visits: {averageVisits}" +
-				$"\nMedian of workshop visits: {medianVisits}" +
-				$"\nAverage time spent in workshop: {averageTime}");*/
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateStatistics([FromBody] UpdateWorkshopDTO dto, int id)
+        public async Task<IActionResult> UpdateStatistics([FromBody] UpdateWorkshopRquest dto, int id)
         {
             if (dto == null || id <= 0)
                 return BadRequest("Invalid workshop data.");
@@ -91,7 +65,8 @@ namespace GameStatistics.Controllers
             return Ok(updatedStats);
         }
 
-        [HttpDelete]
+        [Authorize]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStatistics(int id)
         {
             var stats = await _service.DeleteStatistics(id);

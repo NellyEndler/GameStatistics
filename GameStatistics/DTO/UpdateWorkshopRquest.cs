@@ -1,6 +1,6 @@
 ﻿namespace GameStatistics.DTO
 {
-	public class UpdateWorkshopDTO
+	public class UpdateWorkshopRquest
 	{
 		public int WorkShopVisits { get; set; }
 		public double TotalWorkshopTimeInSeconds { get; set; }

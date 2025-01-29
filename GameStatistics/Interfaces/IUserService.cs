@@ -8,19 +8,19 @@ namespace GameStatistics.Interfaces
 {
     public interface IUserService
     {
-        Task<IdentityResult?> RegisterUser(UserDTO dto);
-        Task<IdentityResult?> RegisterAdmin(UserDTO dto);
-        Task<Microsoft.AspNetCore.Identity.SignInResult> LoginUser(LoginDTO dto);
+        Task<IdentityResult?> RegisterUser(UserRequest dto);
+        Task<IdentityResult?> RegisterAdmin(UserRequest dto);
+        Task<Microsoft.AspNetCore.Identity.SignInResult> LoginUser(LoginRequest request);
         Task<(string jwtToken, string refreshToken)> GenerateJwtToken(ApplicationUser user);
         string GenerateRefreshToken();
         Task StoreRefreshToken(ApplicationUser user, string refreshToken);
         Task<bool> ValidateRefreshToken(ApplicationUser user, string refreshToken);
         Task<ApplicationUser?> GetUserByUsername(string username);
         Task<ApplicationUser?> GetUserById(string id);
-        Task<List<ShowUserDTO>?> GetAllUsers(string? role);
+        Task<List<UserResponse>?> GetAllUsers(string? role);
         //public Task <List<ApplicationUser>?> GetAllAdmins();
-        Task<UpdateAdminDTO?> UpdateAdmin(UpdateAdminDTO dto, string? id);
-        Task<IdentityResult?> UpdateUser(UpdateUserDTO dto, string? id);
+        Task<UpdateAdminRequest?> UpdateAdmin(UpdateAdminRequest dto, string? id);
+        Task<IdentityResult?> UpdateUser(UpdateUserRequest dto, string? id);
         Task<IdentityResult?> DeleteUser(string? id);
         Task<IdentityResult?> DeleteUserAdmin(int id);
         Task<bool> DeleteService(string? currentUserRole, string? currentUserId, int id);
